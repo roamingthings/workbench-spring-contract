@@ -1,7 +1,10 @@
+import org.springframework.cloud.contract.verifier.config.TestMode
+
+
 buildscript {
 	ext {
-		springBootVersion = '2.0.5.RELEASE'
-        verifierPluginVersion = '2.0.1.RELEASE'
+		springBootVersion = '2.1.5.RELEASE'
+        verifierPluginVersion = '2.1.1.RELEASE'
 	}
 	repositories {
 		mavenCentral()
@@ -30,30 +33,36 @@ repositories {
 }
 
 ext {
-	springCloudVersion = 'Finchley.SR1'
-}
-
-dependencies {
-	implementation('org.springframework.boot:spring-boot-starter-web')
-	compileOnly('org.projectlombok:lombok:1.18.2')
-	testImplementation('org.springframework.boot:spring-boot-starter-test')
-	testImplementation('org.springframework.cloud:spring-cloud-starter-contract-verifier')
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}")
-    testCompile("org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}")
-    testCompile("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+	springCloudVersion = 'Greenwich.SR1'
 }
 
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-        mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:${verifierPluginVersion}"
+		mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:${verifierPluginVersion}"
 	}
 }
 
+dependencies {
+	implementation('org.springframework.boot:spring-boot-starter-web')
+	compileOnly('org.projectlombok:lombok')
+	annotationProcessor('org.projectlombok:lombok')
+
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('org.springframework.cloud:spring-cloud-starter-contract-verifier')
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
+	testImplementation("org.mockito:mockito-junit-jupiter")
+}
+
 contracts {
-    testMode = 'MockMvc'
+    testMode = TestMode.MOCKMVC
     baseClassForTests = 'de.roamingthings.workbench.contractproducer.ContractTestBase'
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
 }
